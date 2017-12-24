@@ -22,6 +22,12 @@ def retrieve(queryset):
     return {'obj': queryset, 'success': False, 'exception': None}
 
 
+def handle_error(props):
+    if props['exception']:
+        return Response({'message': 'Bad request'}, status=400)
+    return Response({'message': 'Not found'}, status=404)
+
+
 def list_accounts(request: http.Request, auth: Auth, session: Session):
     queryset = session.Account.objects.filter(owner=auth.user['id'])
     return [AccountSchema(account) for account in queryset]
@@ -30,11 +36,9 @@ def list_accounts(request: http.Request, auth: Auth, session: Session):
 def get_account(request: http.Request, auth: Auth, session: Session, uuid):
     queryset = session.Account.objects.filter(uuid=uuid).filter(owner=auth.user['id'])
     props = retrieve(queryset)
-    if props['success']:
-        return AccountSchema(props['obj'])
-    elif props['exception']:
-        return Response({'message': 'Bad request'}, status=400)
-    return Response({'message': 'Not found'}, status=404)
+    if props['error']:
+        return handle_error(props)    
+    return AccountSchema(props['obj'])
 
 
 def create_account(request: http.Request, auth: Auth, session: Session, data: AccountSchema):
@@ -46,22 +50,18 @@ def create_account(request: http.Request, auth: Auth, session: Session, data: Ac
 def update_account(request: http.Request, auth: Auth, session: Session, data: AccountSchema, uuid):
     queryset = session.Account.objects.filter(uuid=uuid).filter(owner=auth.user['id'])
     props = retrieve(queryset)
-    if props['success']:
-        for attr, value in data.items():
-            setattr(props['obj'], attr, value)
-        props['obj'].save()
-        return AccountSchema(account)
-    elif props['exception']:
-        return Response({'message': 'Bad request'}, status=400)
-    return Response({'message': 'Not found'}, status=404)
+    if props['error']:
+        return handle_error(props)
+    for attr, value in data.items():
+        setattr(props['obj'], attr, value)
+    props['obj'].save()
+    return AccountSchema(account)
 
 
 def delete_account(request: http.Request, auth: Auth, session: Session, uuid):
     queryset = session.Account.objects.filter(uuid=uuid).filter(owner=auth.user['id'])
     props = retrieve(queryset)
-    if props['success']:
-        props['obj'].delete()
-        return Response(None, status=204)
-    elif props['exception']:
-        return Response({'message': 'Bad request'}, status=400)
-    return Response({'message': 'Not found'}, status=404)
+    if props['error']:
+        return handle_error(props)
+    props['obj'].delete()
+    return Response(None, status=204)
