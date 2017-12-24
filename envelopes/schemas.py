@@ -8,7 +8,7 @@ class AccountSchema(typesystem.Object):
         'id': typesystem.integer(minimum=1),
         'uuid': typesystem.string(min_length=36),
         'balance': typesystem.number(),
-        'owner': typesystem.integer(minimum=1),
+        'owner_id': typesystem.integer(minimum=1),
         'created': typesystem.string(format='date'),
         'modified': typesystem.string(format='date'),
     }

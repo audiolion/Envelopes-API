@@ -1,6 +1,5 @@
 import os
 from apistar_jwt.authentication import JWTAuthentication
-from utils.renderers import JSONRenderer
 
 settings = {
     'AUTHENTICATION': [JWTAuthentication()],

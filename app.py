@@ -21,9 +21,9 @@ from envelopes import views
 account_routes = [
     Route('/', 'GET', views.list_accounts),
     Route('/', 'POST', views.create_account),
-    # Route('/{uuid}', 'GET', views.get_account),
+    Route('/{uuid}/', 'GET', views.get_account),
     # Route('/{uuid}', 'PUT', views.update_account),
-    # Route('/{uuid}', 'PATCH', views.update_account),
+    Route('/{uuid}/', 'PATCH', views.update_account),
     # Route('/{uuid}', 'DELETE', views.delete_account),
 ]
 
