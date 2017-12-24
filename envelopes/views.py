@@ -11,7 +11,7 @@ from .models import Account, Envelope, Category, Transaction
 from .schemas import AccountSchema, EnvelopeSchema, CategorySchema, TransactionSchema
 
 
-def try(queryset):
+def retrieve(queryset):
     try:
         if queryset.exists():
             return {'obj': queryset.get(), 'success': True, 'exception': None}
@@ -29,7 +29,7 @@ def list_accounts(request: http.Request, auth: Auth, session: Session):
 
 def get_account(request: http.Request, auth: Auth, session: Session, uuid):
     queryset = session.Account.objects.filter(uuid=uuid).filter(owner=auth.user['id'])
-    props = try(queryset)
+    props = retrieve(queryset)
     if props['success']:
         return AccountSchema(props['obj'])
     elif props['exception']:
@@ -45,12 +45,23 @@ def create_account(request: http.Request, auth: Auth, session: Session, data: Ac
 
 def update_account(request: http.Request, auth: Auth, session: Session, data: AccountSchema, uuid):
     queryset = session.Account.objects.filter(uuid=uuid).filter(owner=auth.user['id'])
-    props = try(queryset)
+    props = retrieve(queryset)
     if props['success']:
         for attr, value in data.items():
             setattr(props['obj'], attr, value)
         props['obj'].save()
         return AccountSchema(account)
+    elif props['exception']:
+        return Response({'message': 'Bad request'}, status=400)
+    return Response({'message': 'Not found'}, status=404)
+
+
+def delete_account(request: http.Request, auth: Auth, session: Session, uuid):
+    queryset = session.Account.objects.filter(uuid=uuid).filter(owner=auth.user['id'])
+    props = retrieve(queryset)
+    if props['success']:
+        props['obj'].delete()
+        return Response(None, status=204)
     elif props['exception']:
         return Response({'message': 'Bad request'}, status=400)
     return Response({'message': 'Not found'}, status=404)
