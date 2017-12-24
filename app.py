@@ -24,7 +24,7 @@ account_routes = [
     Route('/{uuid}/', 'GET', views.get_account),
     # Route('/{uuid}', 'PUT', views.update_account),
     Route('/{uuid}/', 'PATCH', views.update_account),
-    # Route('/{uuid}', 'DELETE', views.delete_account),
+    Route('/{uuid}/', 'DELETE', views.delete_account),
 ]
 
 envelope_routes = [
