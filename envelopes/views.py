@@ -5,8 +5,21 @@ from apistar.interfaces import Auth
 from apistar.backends.django_orm import Session
 from apistar_jwt.token import JWT
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
+
 from .models import Account, Envelope, Category, Transaction
 from .schemas import AccountSchema, EnvelopeSchema, CategorySchema, TransactionSchema
+
+
+def try(queryset):
+    try:
+        if queryset.exists():
+            return {'obj': queryset.get(), 'success': True, 'exception': None}
+    except ObjectDoesNotExist as e:
+        return {'obj': None, 'success': False, 'exception': e}
+    except Exception as f:
+        return {'obj': None, 'success': False, 'exception': e}
+    return {'obj': queryset, 'success': False, 'exception': None}
 
 
 def list_accounts(request: http.Request, auth: Auth, session: Session):
@@ -16,10 +29,10 @@ def list_accounts(request: http.Request, auth: Auth, session: Session):
 
 def get_account(request: http.Request, auth: Auth, session: Session, uuid):
     queryset = session.Account.objects.filter(uuid=uuid).filter(owner=auth.user['id'])
-    try:
-        if queryset.exists():
-            return AccountSchema(queryset.get())
-    except Exception:
+    props = try(queryset)
+    if props['success']:
+        return AccountSchema(props['obj'])
+    elif props['exception']:
         return Response({'message': 'Bad request'}, status=400)
     return Response({'message': 'Not found'}, status=404)
 
@@ -32,13 +45,12 @@ def create_account(request: http.Request, auth: Auth, session: Session, data: Ac
 
 def update_account(request: http.Request, auth: Auth, session: Session, data: AccountSchema, uuid):
     queryset = session.Account.objects.filter(uuid=uuid).filter(owner=auth.user['id'])
-    try:
-        if queryset.exists():
-            account = queryset.get()
-            for attr, value in data.items():
-                setattr(account, attr, value)
-            account.save()
-            return AccountSchema(account)
-    except Exception:
+    props = try(queryset)
+    if props['success']:
+        for attr, value in data.items():
+            setattr(props['obj'], attr, value)
+        props['obj'].save()
+        return AccountSchema(account)
+    elif props['exception']:
         return Response({'message': 'Bad request'}, status=400)
     return Response({'message': 'Not found'}, status=404)
