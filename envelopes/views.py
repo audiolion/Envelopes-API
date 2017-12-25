@@ -42,7 +42,6 @@ def get_account(request: http.Request, auth: Auth, session: Session, uuid):
 
 
 def create_account(request: http.Request, auth: Auth, session: Session, data: AccountSchema):
-    data['owner_id'] = data.pop('owner', None)
     account = session.Account.objects.create(**data)
     return Response(AccountSchema(account), status=201)
 
