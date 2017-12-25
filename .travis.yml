@@ -15,8 +15,8 @@ before_script:
     - psql -c 'create database envelopes;' -U postgres
 
 script:
-    - scripts/lint
-    - scripts/test
+    - bash scripts/lint
+    - bash scripts/test
 
 after_script:
     - codecov
