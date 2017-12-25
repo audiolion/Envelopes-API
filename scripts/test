@@ -1,0 +1,16 @@
+#!/bin/sh -e
+
+export PREFIX=""
+if [ -d 'venv' ] ; then
+  export PREFIX="venv/bin/"
+fi
+
+export EXTRA_COVERAGE_FLAGS=""
+if [ "$TRAVIS" != "true" ] ; then
+  # If we;re on travis we'll allow codecov to handle coverage pass/fail
+  export EXTRA_COVERAGE_FLAGS="--cov-fail-under=100 --no-cov-on-fail"
+fi
+
+set -x
+
+PYTHONPATH=. ${PREFIX}apistar test --ignore venv --cov=envelopes --cov-report=term-missing ${EXTRA_COVERAGE_FLAGS} ${@}

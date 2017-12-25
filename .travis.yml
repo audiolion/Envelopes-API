@@ -1,0 +1,22 @@
+language: python
+
+cache: pip
+
+python:
+    - "3.6"
+
+install:
+    - pip install -r requirements.txt
+
+services:
+    - postgresql
+
+before_script:
+    - psql -c 'create database envelopes;' -U postgres
+
+script:
+    - scripts/lint
+    - scripts/test
+
+after_script:
+    - codecov
