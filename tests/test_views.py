@@ -1,14 +1,15 @@
+# Standard Library Imports
 import os
 
+# Third Party Library Imports
 import pytest
-
 from apistar import Settings, TestClient
 from apistar_jwt.token import JWT
 from django.contrib.auth import get_user_model
 
-from envelopes.models import Account
+# First Party Library Imports
 from app import app
-
+from envelopes.models import Account
 
 User = get_user_model()
 

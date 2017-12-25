@@ -1,6 +1,6 @@
+# Third Party Library Imports
 from django.conf import settings
 from hashids import Hashids
-
 
 hashid = Hashids(
     min_length=8,

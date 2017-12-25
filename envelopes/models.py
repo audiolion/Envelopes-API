@@ -1,13 +1,15 @@
+# Standard Library Imports
 import json
 import uuid
 from itertools import chain
 
-from django.conf import settings
-from django.db import models
-from django.db import transaction as db_transaction
-
+# Third Party Library Imports
 from behaviors.behaviors import Timestamped
+from django.conf import settings
+from django.db import transaction as db_transaction
+from django.db import models
 
+# Local Imports
 from .utils import encode
 
 
