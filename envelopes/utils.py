@@ -8,5 +8,6 @@ hashid = Hashids(
     alphabet='0123456789ACDEFGHIJKLOQRSTUVWXYZ',
 )
 
+
 def encode(num):
     return hashid.encode(num)

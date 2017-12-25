@@ -1,17 +1,11 @@
-# Standard Library Imports
-import typing
-
 # Third Party Library Imports
-from apistar import Response, annotate, exceptions, http
+from apistar import Response, http
 from apistar.backends.django_orm import Session
 from apistar.interfaces import Auth
-from apistar_jwt.token import JWT
-from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 
 # Local Imports
-from .models import Account, Category, Envelope, Transaction
-from .schemas import AccountSchema, CategorySchema, EnvelopeSchema, TransactionSchema
+from .schemas import AccountSchema
 
 
 def retrieve(queryset):
@@ -21,7 +15,7 @@ def retrieve(queryset):
     except ObjectDoesNotExist as e:
         return {'obj': None, 'success': False, 'exception': e}
     except Exception as f:
-        return {'obj': None, 'success': False, 'exception': e}
+        return {'obj': None, 'success': False, 'exception': f}
     return {'obj': queryset, 'success': False, 'exception': None}
 
 
@@ -40,7 +34,7 @@ def get_account(request: http.Request, auth: Auth, session: Session, uuid):
     queryset = session.Account.objects.filter(uuid=uuid).filter(owner=auth.user['id'])
     props = retrieve(queryset)
     if props['error']:
-        return handle_error(props)    
+        return handle_error(props)
     return AccountSchema(props['obj'])
 
 
@@ -57,7 +51,7 @@ def update_account(request: http.Request, auth: Auth, session: Session, data: Ac
     for attr, value in data.items():
         setattr(props['obj'], attr, value)
     props['obj'].save()
-    return AccountSchema(account)
+    return AccountSchema(props['obj'])
 
 
 def delete_account(request: http.Request, auth: Auth, session: Session, uuid):

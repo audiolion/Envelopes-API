@@ -24,10 +24,11 @@ class JsonModelMixin:
             if field in include:
                 data[field.name] = field.value_from_object(self)
                 if field.many_to_many:
-                    if instance.pk is None:
+                    if self.pk is None:
                         data[field.name] = []
                     else:
-                        data[field.name] = list(field.value_from_object(instance).values_list('pk', flat=True))
+                        data[field.name] = list(
+                            field.value_from_object(self).values_list('pk', flat=True))
                 # data.update({field.name: getattr(self, field.name, None)})
                 # TODO: handle relations to output their serializable value (primary key??)
         return data
@@ -38,14 +39,16 @@ class JsonModelMixin:
 
 class Account(JsonModelMixin, Timestamped):
     id = models.AutoField(primary_key=True)
-    uuid = models.UUIDField(unique=True, default=uuid.uuid4, editable=False, verbose_name='Public Identifier')
+    uuid = models.UUIDField(
+        unique=True, default=uuid.uuid4, editable=False, verbose_name='Public Identifier')
     balance = models.DecimalField(max_digits=14, decimal_places=2)
     owner = models.ForeignKey(settings.AUTH_USER_MODEL)
 
 
 class Envelope(models.Model):
     id = models.AutoField(primary_key=True)
-    uuid = models.UUIDField(unique=True, default=uuid.uuid4, editable=False, verbose_name='Envelope Identifier')
+    uuid = models.UUIDField(
+        unique=True, default=uuid.uuid4, editable=False, verbose_name='Envelope Identifier')
     creator = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.PROTECT,
@@ -114,7 +117,7 @@ class Envelope(models.Model):
         assert amount > 0
         description = '' if description is None else description
         comment = '' if comment is None else comment
-        with transaction.atomic():
+        with db_transaction.atomic():
             envelope = cls.objects.select_for_update().get(uuid=uuid)
             envelope.balance -= amount
             envelope.modified = dt

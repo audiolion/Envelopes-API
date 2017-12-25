@@ -3,7 +3,7 @@ import os
 
 # Third Party Library Imports
 import pytest
-from apistar import Settings, TestClient
+from apistar import TestClient
 from apistar_jwt.token import JWT
 from django.contrib.auth import get_user_model
 
@@ -12,6 +12,7 @@ from app import app
 from envelopes.models import Account
 
 User = get_user_model()
+
 
 def create_auth(user):
     payload = {'user': user.id, 'username': user.email}
