@@ -16,7 +16,7 @@ before_script:
 
 script:
     - bash scripts/lint
-    - pytest --ignore venv --cov=envelopes --cov-report=term-missing
+    - bash scripts/test
 
 after_script:
     - codecov
