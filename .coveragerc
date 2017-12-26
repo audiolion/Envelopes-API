@@ -1,0 +1,6 @@
+[run]
+branch = true
+omit = */tests/*, */tests.py, */migrations/*, */settings/*, fabfile.py, __pycache__
+
+[report]
+show_missing = true
