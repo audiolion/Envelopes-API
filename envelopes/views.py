@@ -11,12 +11,12 @@ from .schemas import AccountSchema
 def retrieve(queryset):
     try:
         if queryset.exists():
-            return {'obj': queryset.get(), 'success': True, 'exception': None}
+            return {'obj': queryset.get(), 'error': False, 'exception': None}
     except ObjectDoesNotExist as e:
-        return {'obj': None, 'success': False, 'exception': e}
+        return {'obj': None, 'error': True, 'exception': e}
     except Exception as f:
-        return {'obj': None, 'success': False, 'exception': f}
-    return {'obj': queryset, 'success': False, 'exception': None}
+        return {'obj': None, 'error': True, 'exception': f}
+    return {'obj': queryset, 'error': True, 'exception': None}
 
 
 def handle_error(props):

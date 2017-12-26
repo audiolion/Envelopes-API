@@ -71,3 +71,19 @@ def test_list_accounts(auth, accounts):
 
     res = client.get('/accounts/')
     assert res.status_code == 401
+
+
+def test_get_account(auth, accounts):
+    client = TestClient(app)
+    url = '/accounts/{}/'.format(accounts[0].uuid)
+    res = client.get(url, headers=auth['header'])
+    assert res.status_code == 404
+    assert res.json() == {'message': 'Not found'}
+
+    auth = create_auth(accounts[0].owner)
+    res = client.get(url, headers=auth['header'])
+    assert res.status_code == 200
+    assert res.json()['uuid'] == str(accounts[0].uuid)
+
+    res = client.get(url)
+    assert res.status_code == 401
