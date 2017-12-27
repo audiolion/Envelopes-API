@@ -2,7 +2,7 @@
 from apistar import typesystem
 
 # Local Imports
-from .models import Transaction
+from . import models
 
 
 class Account(typesystem.Object):
@@ -39,9 +39,9 @@ class Envelope(typesystem.Object):
 
 class ActionTypeEnum(typesystem.Enum):
     enum = [
-        Transaction.ACTION_TYPE_CREATED,
-        Transaction.ACTION_TYPE_DEPOSITED,
-        Transaction.ACTION_TYPE_WITHDRAWN,
+        models.Transaction.ACTION_TYPE_CREATED,
+        models.Transaction.ACTION_TYPE_DEPOSITED,
+        models.Transaction.ACTION_TYPE_WITHDRAWN,
     ]
 
 
