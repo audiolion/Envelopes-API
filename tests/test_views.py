@@ -102,7 +102,7 @@ def test_create_account(auth):
     assert res.status_code == 201
     assert res.json()['owner'] == data['owner']
     assert res.json()['balance'] == data['balance']
-    Account.objects.get(id=res.json()['id']).delete()
+    Account.objects.get(uuid=res.json()['uuid']).delete()
 
     res = client.post('/accounts/', data=data)
     assert res.status_code == 401
