@@ -44,6 +44,9 @@ class Account(JsonModelMixin, Timestamped):
     balance = models.DecimalField(max_digits=14, decimal_places=2)
     owner = models.ForeignKey(settings.AUTH_USER_MODEL)
 
+    def __str__(self):
+        return 'Owner: {} balance: {}'.format(self.owner, self.balance)
+
 
 class Envelope(models.Model):
     id = models.AutoField(primary_key=True)
@@ -140,6 +143,9 @@ class Envelope(models.Model):
 class Category(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=80)
+
+    def __str__(self):
+        return self.name
 
 
 class Transaction(models.Model):
