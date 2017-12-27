@@ -8,7 +8,7 @@ class Account(Schema):
     balance = fields.Decimal(places=2, required=True, as_string=True)
     owner_id = fields.Integer(min=1, required=True, load_from='owner', dump_to='owner')
     created = fields.DateTime()
-    modified = fields.DateTime()
+    modified = fields.DateTime(allow_none=True)
 
     @post_load
     def make_account(self, data):
