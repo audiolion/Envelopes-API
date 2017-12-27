@@ -8,7 +8,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from . import schemas
 from .forms import AccountForm
 
-account_schema = schemas.Account(exclude=('id'))
+account_schema = schemas.Account(exclude=('id',))
 
 
 def retrieve(queryset):
