@@ -2,7 +2,7 @@
 from django import forms
 
 # Local Imports
-from .models import Account, Category, Envelope
+from .models import Account, Category, Envelope, Transaction
 
 
 class AccountForm(forms.ModelForm):
@@ -26,3 +26,11 @@ class CategoryForm(forms.ModelForm):
     class Meta:
         model = Category
         fields = ('name', )
+
+
+class TransactionForm(forms.ModelForm):
+    delta = forms.DecimalField(max_digits=14, decimal_places=2)
+
+    class Meta:
+        model = Transaction
+        fields = ('user', 'envelope', 'action_type', 'delta', 'description', 'category', 'comment')

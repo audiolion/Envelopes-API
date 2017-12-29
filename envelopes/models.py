@@ -85,7 +85,7 @@ class Envelope(models.Model):
             transaction = Transaction.create(
                 user=user,
                 envelope=envelope,
-                type=Transaction.ACTION_TYPE_CREATED,
+                action_type=Transaction.ACTION_TYPE_CREATED,
                 delta=0,
                 created=dt,
             )
@@ -142,7 +142,7 @@ class Envelope(models.Model):
 
 class Category(models.Model):
     id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=80)
+    name = models.CharField(max_length=80, unique=True)
 
     def __str__(self):
         return self.name
@@ -168,14 +168,14 @@ class Transaction(models.Model):
     )
     created = models.DateTimeField(blank=True)
     envelope = models.ForeignKey(Envelope, related_name='transactions')
-    type = models.CharField(max_length=30, choices=ACTION_TYPE_CHOICES)
+    action_type = models.CharField(max_length=30, choices=ACTION_TYPE_CHOICES)
     delta = models.DecimalField(max_digits=14, decimal_places=2, help_text="Balance delta")
     description = models.CharField(max_length=100, blank=True)
     category = models.ForeignKey(Category, blank=True, null=True, related_name='transactions')
     comment = models.TextField(blank=True)
 
     @classmethod
-    def create(cls, user, envelope, type, delta, dt, description=None, comment=None, **kwargs):
+    def create(cls, user, envelope, action_type, delta, dt, description=None, comment=None, **kwargs):  # noqa; E501
         assert dt is not None
         description = '' if description is None else description
         comment = '' if comment is None else comment
@@ -185,7 +185,7 @@ class Transaction(models.Model):
             created=dt,
             user=user,
             envelope=envelope,
-            type=type,
+            action_type=action_type,
             delta=delta,
             description=description,
             comment=comment,

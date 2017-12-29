@@ -6,12 +6,12 @@ from django.core.exceptions import ObjectDoesNotExist
 
 # Local Imports
 from . import schemas
-from .forms import AccountForm, CategoryForm, EnvelopeForm
-
+from .forms import AccountForm, CategoryForm, EnvelopeForm, TransactionForm
 
 account_schema = schemas.Account(exclude=('id',))
 category_schema = schemas.Category(exclude=('id',))
 envelope_schema = schemas.Envelope(exclude=('id',))
+transaction_schema = schemas.Envelope(exclude=('id',))
 
 
 def retrieve(queryset):
@@ -82,7 +82,7 @@ def delete_account(request: http.Request, auth: Auth, session: Session, uuid):
 
 def list_envelopes(request: http.Request, auth: Auth, session: Session):
     queryset = session.Envelope.objects.filter(account__owner_id=auth.user['id'])
-    envelopes = envelopes_schema.dump(queryset, many=True)
+    envelopes = envelope_schema.dump(queryset, many=True)
     return envelopes.data
 
 
@@ -131,7 +131,7 @@ def delete_envelope(request: http.Request, auth: Auth, session: Session, uuid):
 
 def list_categories(request: http.Request, auth: Auth, session: Session):
     queryset = session.Category.objects.all()
-    categories = categories_schema.dump(queryset, many=True)
+    categories = category_schema.dump(queryset, many=True)
     return categories.data
 
 
@@ -155,7 +155,7 @@ def create_category(request: http.Request, auth: Auth, session: Session, data: h
     return Response(category_schema.dump(category).data, status=201)
 
 
-def update_category(request: http.Request, auth: Auth, session: Session, data: http.RequestData, name)
+def update_category(request: http.Request, auth: Auth, session: Session, data: http.RequestData, name):  # noqa; E501
     queryset = session.Category.objects.filter(name=name)
     props = retrieve(queryset)
     if props['error']:
@@ -169,6 +169,53 @@ def update_category(request: http.Request, auth: Auth, session: Session, data: h
 
 def delete_category(request: http.Request, auth: Auth, session: Session, name):
     queryset = session.Category.objects.filter(name=name)
+    props = retrieve(queryset)
+    if props['error']:
+        return handle_error(props)
+    props['obj'].delete()
+    return Response(None, status=204)
+
+
+def list_transactions(request: http.Request, auth: Auth, session: Session):
+    queryset = session.Transaction.objects.all()
+    transactions = transaction_schema.dump(queryset, many=True)
+    return transactions.data
+
+
+def get_transaction(request: http.Request, auth: Auth, session: Session, friendly_id):
+    queryset = session.Transaction.objects.filter(friendly_id=friendly_id)
+    props = retrieve(queryset)
+    if props['error']:
+        return handle_error(props)
+    transaction, errors = transaction_schema.dump(props['obj'])
+    if errors:
+        return Response(errors, status=400)
+    return transaction
+
+
+def create_transaction(request: http.Request, auth: Auth, session: Session, data: http.RequestData):  # noqa; E501
+    transaction_schema.context['session'] = session
+    transaction, errors = transaction_schema.load(data)
+    if errors:
+        return Response(errors, status=400)
+    transaction.save()
+    return Response(transaction_schema.dump(transaction).data, status=201)
+
+
+def update_transaction(request: http.Request, auth: Auth, session: Session, data: http.RequestData, friendly_id):  # noqa; E501
+    queryset = session.Transaction.objects.filter(friendly_id=friendly_id)
+    props = retrieve(queryset)
+    if props['error']:
+        return handle_error(props)
+    form = TransactionForm(data, instance=props['obj'])
+    if form.is_valid():
+        transaction = form.save()
+        return transaction_schema.dump(transaction).data
+    return Response(form.errors, status=400)
+
+
+def delete_transaction(request: http.Request, auth: Auth, session: Session, friendly_id):
+    queryset = session.Transaction.objects.filter(friendly_id=friendly_id)
     props = retrieve(queryset)
     if props['error']:
         return handle_error(props)
