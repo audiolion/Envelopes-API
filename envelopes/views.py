@@ -6,9 +6,11 @@ from django.core.exceptions import ObjectDoesNotExist
 
 # Local Imports
 from . import schemas
-from .forms import AccountForm, EnvelopeForm
+from .forms import AccountForm, CategoryForm, EnvelopeForm
+
 
 account_schema = schemas.Account(exclude=('id',))
+category_schema = schemas.Category(exclude=('id',))
 envelope_schema = schemas.Envelope(exclude=('id',))
 
 
@@ -126,3 +128,49 @@ def delete_envelope(request: http.Request, auth: Auth, session: Session, uuid):
     props['obj'].delete()
     return Response(None, status=204)
 
+
+def list_categories(request: http.Request, auth: Auth, session: Session):
+    queryset = session.Category.objects.all()
+    categories = categories_schema.dump(queryset, many=True)
+    return categories.data
+
+
+def get_category(request: http.Request, auth: Auth, session: Session, name):
+    queryset = session.Category.objects.filter(name=name)
+    props = retrieve(queryset)
+    if props['error']:
+        return handle_error(props)
+    category, errors = category_schema.dump(props['obj'])
+    if errors:
+        return Response(errors, status=400)
+    return category
+
+
+def create_category(request: http.Request, auth: Auth, session: Session, data: http.RequestData):
+    category_schema.context['session'] = session
+    category, errors = category_schema.load(data)
+    if errors:
+        return Response(errors, status=400)
+    category.save()
+    return Response(category_schema.dump(category).data, status=201)
+
+
+def update_category(request: http.Request, auth: Auth, session: Session, data: http.RequestData, name)
+    queryset = session.Category.objects.filter(name=name)
+    props = retrieve(queryset)
+    if props['error']:
+        return handle_error(props)
+    form = CategoryForm(data, instance=props['obj'])
+    if form.is_valid():
+        category = form.save()
+        return category_schema.dump(category).data
+    return Response(form.errors, status=400)
+
+
+def delete_category(request: http.Request, auth: Auth, session: Session, name):
+    queryset = session.Category.objects.filter(name=name)
+    props = retrieve(queryset)
+    if props['error']:
+        return handle_error(props)
+    props['obj'].delete()
+    return Response(None, status=204)

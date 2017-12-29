@@ -2,7 +2,7 @@
 from django import forms
 
 # Local Imports
-from .models import Account, Envelope
+from .models import Account, Category, Envelope
 
 
 class AccountForm(forms.ModelForm):
@@ -20,3 +20,9 @@ class EnvelopeForm(forms.ModelForm):
     class Meta:
         model = Envelope
         fields = ('name', 'description', 'budget', 'balance', 'account')
+
+
+class CategoryForm(forms.ModelForm):
+    class Meta:
+        model = Category
+        fields = ('name', )

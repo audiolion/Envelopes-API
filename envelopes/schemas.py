@@ -30,3 +30,9 @@ class Envelope(Schema):
     @post_load
     def make_envelope(self, data):
         return self.context['session'].Envelope(**data)
+
+
+class Category(Schema):
+    id = fields.Integer(min=1)
+    name = fields.String(validate=[validate.Length(max=80)])
+
