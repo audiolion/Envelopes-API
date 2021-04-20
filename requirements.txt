@@ -17,7 +17,7 @@ Jinja2==2.9.6
 MarkupSafe==1.0
 marshmallow==3.0.0b4
 psycopg2==2.7.3
-py==1.4.34
+py==1.10.0
 PyJWT==1.5.3
 python-dateutil==2.6.1
 python-dotenv==0.6.5
